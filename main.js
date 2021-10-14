@@ -14,7 +14,8 @@ import {
     PointLight,
     Object3D,
     CircleGeometry,
-    Raycaster
+    Raycaster,
+    BoxGeometry
 } from './js/three.module.js'
 
 import { TTFLoader } from './js/TTFLoader.js'
@@ -59,25 +60,66 @@ class ClockItem extends Object3D {
     }
 }
 
+class ClockNumber extends Object3D {
+    constructor() {
+        super()
+        const numbers = [
+            { number: '12' },
+            { number: '1' },
+            { number: '2' },
+            { number: '3' },
+            { number: '4' },
+            { number: '5' },
+            { number: '6' },
+            { number: '7' },
+            { number: '8' },
+            { number: '9' },
+            { number: '10' },
+            { number: '11' },
+        ]
+
+        const numFirstPosition = new Vector3(0, 65, 2)
+        const numAxis = new Vector3(0, 0, 1)
+        const createNumberPosition = (deg) => new Vector3().copy(numFirstPosition).applyAxisAngle(numAxis, Math.PI / 6 * deg)
+        numbers.forEach(({ number }, index) => {
+            const textMat = new MeshPhongMaterial({ color: 0xffff00, flatShading: true })
+            const textGeo = new TextGeometry(number, {
+                font,
+                size: 10,
+                height: 10,
+                curveSegments: 4,
+                bevelThickness: 2,
+                bevelSize: 1.5,
+                bevelEnabled: true
+            })
+            textGeo.computeBoundingBox()
+            textGeo.computeVertexNormals()
+            const textMesh = new Mesh(textGeo, textMat)
+            textMesh.position.copy(createNumberPosition(-index))
+            this.add(textMesh)
+        })
+    }
+}
+
 class ClockSystem extends Object3D {
     constructor() {
         super()
         const firstPosition = new Vector3(0, 90, 1)
         const axis = new Vector3(0, 0, 1)
-        const createPostion = (angle) => new Vector3().copy(firstPosition).applyAxisAngle(axis, Math.PI / 6 * angle)
+        const createPosition = (deg) => new Vector3().copy(firstPosition).applyAxisAngle(axis, Math.PI / 6 * deg)
         const items = [
             { text: '子', link: 'https://ntut-cg-lab.github.io/cg2021f-hw01-slime21023/', position: firstPosition },
-            { text: '丑', link: 'https://ntut-cg-lab.github.io/cg2021f-hw02-slime21023/', position: createPostion(11) },
-            { text: '寅', link: 'https://ntut-cg-lab.github.io/cg2021f-hw03-slime21023/', position: createPostion(10) },
-            { text: '卯', link: 'https://ntut-cg-lab.github.io/cg2021f-hw04-slime21023/', position: createPostion(9) },
-            { text: '辰', link: 'https://ntut-cg-lab.github.io/cg2021f-hw05-slime21023/', position: createPostion(8) },
-            { text: '巳', link: 'https://ntut-cg-lab.github.io/cg2021f-hw06-slime21023/', position: createPostion(7) },
-            { text: '午', link: 'https://ntut-cg-lab.github.io/cg2021f-hw07-slime21023/', position: createPostion(6) },
-            { text: '未', link: 'https://ntut-cg-lab.github.io/cg2021f-hw08-slime21023/', position: createPostion(5) },
-            { text: '申', link: 'https://ntut-cg-lab.github.io/cg2021f-hw09-slime21023/', position: createPostion(4) },
-            { text: '酉', link: 'https://ntut-cg-lab.github.io/cg2021f-hw10-slime21023/', position: createPostion(3) },
-            { text: '戌', link: 'https://ntut-cg-lab.github.io/cg2021f-hw11-slime21023/', position: createPostion(2) },
-            { text: '亥', link: 'https://ntut-cg-lab.github.io/cg2021f-hw12-slime21023/', position: createPostion(1) }
+            { text: '丑', link: 'https://ntut-cg-lab.github.io/cg2021f-hw02-slime21023/', position: createPosition(11) },
+            { text: '寅', link: 'https://ntut-cg-lab.github.io/cg2021f-hw03-slime21023/', position: createPosition(10) },
+            { text: '卯', link: 'https://ntut-cg-lab.github.io/cg2021f-hw04-slime21023/', position: createPosition(9) },
+            { text: '辰', link: 'https://ntut-cg-lab.github.io/cg2021f-hw05-slime21023/', position: createPosition(8) },
+            { text: '巳', link: 'https://ntut-cg-lab.github.io/cg2021f-hw06-slime21023/', position: createPosition(7) },
+            { text: '午', link: 'https://ntut-cg-lab.github.io/cg2021f-hw07-slime21023/', position: createPosition(6) },
+            { text: '未', link: 'https://ntut-cg-lab.github.io/cg2021f-hw08-slime21023/', position: createPosition(5) },
+            { text: '申', link: 'https://ntut-cg-lab.github.io/cg2021f-hw09-slime21023/', position: createPosition(4) },
+            { text: '酉', link: 'https://ntut-cg-lab.github.io/cg2021f-hw10-slime21023/', position: createPosition(3) },
+            { text: '戌', link: 'https://ntut-cg-lab.github.io/cg2021f-hw11-slime21023/', position: createPosition(2) },
+            { text: '亥', link: 'https://ntut-cg-lab.github.io/cg2021f-hw12-slime21023/', position: createPosition(1) }
         ]
 
         const createClockItem = ({ text, link, position }) => new ClockItem(text, link, position)
@@ -87,6 +129,47 @@ class ClockSystem extends Object3D {
         const circleMash = new Mesh(circleGeo, circleMat)
         circleMash.position.set(0, 0, 0)
         this.add(circleMash)
+
+        const clockNum = new ClockNumber()
+        clockNum.position.set(0, 0, 0)
+        this.add(clockNum)
+        
+        // ClockTime
+        
+
+        const hourhandGeo = new BoxGeometry(3, 1.0, 200)
+        const hourhandMater = new MeshBasicMaterial({ color: 0x00ff00 })
+        const hourhandMesh = new Mesh(hourhandGeo, hourhandMater)
+        hourhandMesh.geometry.computeBoundingBox()
+        const hourhandCenter = new Vector3()
+        hourhandMesh.geometry.boundingBox.getCenter(hourhandCenter)
+        hourhandMesh.localToWorld(hourhandCenter)
+        this.add(hourhandMesh)
+        this.hour = hourhandMesh
+
+        const minutehandGeo = new BoxGeometry(2, 0.5, 300)
+        const minutehandMater = new MeshBasicMaterial({ color: 0x00ffff })
+        const minutehandMesh = new Mesh(minutehandGeo, minutehandMater)
+        minutehandMesh.geometry.computeBoundingBox()
+        const minutehandCenter = new Vector3()
+        minutehandMesh.geometry.boundingBox.getCenter(minutehandCenter)
+        minutehandMesh.localToWorld(minutehandCenter)
+        this.add(minutehandMesh)
+        this.minute = minutehandMesh
+
+        const secondhandGeo = new BoxGeometry(0.5, 0.8,350)
+        const secondhandMater = new MeshBasicMaterial({ color: 0x0fffff })
+        const secondhandMesh = new Mesh(secondhandGeo, secondhandMater)
+        secondhandMesh.geometry.computeBoundingBox()
+        const secondhandCenter = new Vector3()
+        secondhandMesh.geometry.boundingBox.getCenter(minutehandCenter)
+        secondhandMesh.localToWorld(secondhandCenter)
+        this.add(secondhandMesh)
+        this.second = secondhandMesh
+    }
+
+    update() {
+
     }
 }
 
