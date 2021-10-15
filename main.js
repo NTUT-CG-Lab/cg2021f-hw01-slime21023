@@ -15,7 +15,8 @@ import {
     Object3D,
     CircleGeometry,
     Raycaster,
-    BoxGeometry
+    BoxGeometry,
+    MathUtils
 } from './js/three.module.js'
 
 import { TTFLoader } from './js/TTFLoader.js'
@@ -133,10 +134,8 @@ class ClockSystem extends Object3D {
         const clockNum = new ClockNumber()
         clockNum.position.set(0, 0, 0)
         this.add(clockNum)
-        
-        // ClockTime
-        
 
+        // ClockTime
         const hourhandGeo = new BoxGeometry(3, 1.0, 200)
         const hourhandMater = new MeshBasicMaterial({ color: 0x00ff00 })
         const hourhandMesh = new Mesh(hourhandGeo, hourhandMater)
@@ -157,7 +156,7 @@ class ClockSystem extends Object3D {
         this.add(minutehandMesh)
         this.minute = minutehandMesh
 
-        const secondhandGeo = new BoxGeometry(0.5, 0.8,350)
+        const secondhandGeo = new BoxGeometry(0.5, 0.8, 350)
         const secondhandMater = new MeshBasicMaterial({ color: 0x0fffff })
         const secondhandMesh = new Mesh(secondhandGeo, secondhandMater)
         secondhandMesh.geometry.computeBoundingBox()
@@ -166,10 +165,20 @@ class ClockSystem extends Object3D {
         secondhandMesh.localToWorld(secondhandCenter)
         this.add(secondhandMesh)
         this.second = secondhandMesh
+        // this.updateHands()
     }
 
-    update() {
+    updateHands() {
+        // let date = new Date()
+        // const second = date.getSeconds()
+        // const minute = date.getMinutes() + second / 60
+        // const hour = date.getHours() + minute / 60
 
+        // console.log(MathUtils.degToRad(second * 6))
+        const axis = new Vector3(0, 0, 1)
+        this.second.rotateOnAxis(axis, Math.PI / 6)
+        // this.minute.rotateY(- MathUtils.degToRad(6 * minute))
+        // this.hour.rotateY(- MathUtils.degToRad(6 * hour))
     }
 }
 
@@ -215,7 +224,7 @@ const onMouseDown = (event) => {
 }
 
 const onWindowResize = () => {
-    windowHalfX = window.innerWidth / 2
+    // windowHalfX = window.innerWidth / 2
     camera.aspect = window.innerWidth / window.innerHeight
     camera.updateProjectionMatrix()
     renderer.setSize(window.innerWidth, window.innerHeight)
@@ -227,6 +236,7 @@ const animate = () => {
     camera.lookAt(cameraTarget)
     raycaster.setFromCamera(mouse, camera)
     renderer.render(scene, camera)
+    // scene.clockSystem.updateHands()
 }
 
 const init = () => {
@@ -256,6 +266,7 @@ const init = () => {
     clock.position.set(0, 190, -50)
     clock.scale.set(1.4, 1.4, 1)
     scene.add(clock)
+    scene.clockSystem = clock
 
     // renderer
     renderer.setPixelRatio(window.devicePixelRatio)
